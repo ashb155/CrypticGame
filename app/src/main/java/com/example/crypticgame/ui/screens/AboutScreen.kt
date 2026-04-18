@@ -1,6 +1,5 @@
 package com.example.crypticgame.ui.screens
 
-import CrypticButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,7 +42,7 @@ fun AboutScreen(onBack: () -> Unit) {
                     color = AccentPrimary,
                     letterSpacing = 12.sp,
                 ),
-                delayPerChar = 60L
+                delayPerChar = 40L
 
             )
 

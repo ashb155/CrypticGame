@@ -44,19 +44,19 @@ fun NavGraph(navController: NavHostController) {
         composable(
             route = Screen.About.route,
             enterTransition = {
-                fadeIn(tween(500, easing = EaseInOut)) +
+                fadeIn(tween(800, easing = EaseInOut)) +
                         slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500, easing = EaseInOut))
             },
             exitTransition = {
-                fadeOut(tween(400, easing = EaseInOut)) +
+                fadeOut(tween(600, easing = EaseInOut)) +
                         slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400, easing = EaseInOut))
             },
             popEnterTransition = {
-                fadeIn(tween(500, easing = EaseInOut)) +
+                fadeIn(tween(800, easing = EaseInOut)) +
                         slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500, easing = EaseInOut))
             },
             popExitTransition = {
-                fadeOut(tween(400, easing = EaseInOut)) +
+                fadeOut(tween(600, easing = EaseInOut)) +
                         slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400, easing = EaseInOut))
             }
         ) {
