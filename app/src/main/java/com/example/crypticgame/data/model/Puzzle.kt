@@ -20,6 +20,7 @@ data class Puzzle(
     val content: String,
     val hint: String,
     val answerHash: String,
+    val storyFragment: String,
     val unlocksNext: Int? = null,
     val assetRef: String? = null
 )
