@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.example.crypticgame.ui.components.CrypticButton
 import com.example.crypticgame.ui.components.TypeText
 import com.example.crypticgame.ui.theme.AccentPrimary
 import com.example.crypticgame.ui.theme.BackgroundDark
@@ -46,9 +47,20 @@ fun PuzzleScreen(
                 color = AccentPrimary.copy(alpha = 0.8f),
                 style = MaterialTheme.typography.bodyLarge
             )
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(40.dp))
+
+
+            if (!currentPuzzle.assetRef.isNullOrBlank()) {
+                CrypticButton(
+                    label = "./download_artefact",
+                    onClick = {
+                        // TODO: Handle opening the artifact
+                    }
+                )
+                Spacer(modifier = Modifier.height(40.dp))
+            }
+        }
 
         Text(
             text = terminalOutput,
@@ -56,6 +68,7 @@ fun PuzzleScreen(
             style = MaterialTheme.typography.bodyMedium
         )
         Spacer(modifier = Modifier.height(16.dp))
+
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(text = "root@kryptiko:~# ", color = AccentPrimary)
             BasicTextField(
