@@ -25,10 +25,3 @@ data class Puzzle(
     val assetRef: String? = null
 )
 
-@Serializable
-data class Chapter(
-    val id: Int,
-    val title: String,
-    val description: String,
-    val puzzles: List<Puzzle>
-)
