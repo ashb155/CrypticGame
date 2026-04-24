@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +29,7 @@ import com.example.crypticgame.ui.screens.MainMenuScreen
 import com.example.crypticgame.ui.screens.PuzzleScreen
 import com.example.crypticgame.ui.theme.BackgroundDark
 import com.example.crypticgame.viewmodel.PuzzleViewModel
+import kotlinx.coroutines.launch
 
 sealed class Screen(val route: String) {
     object MainMenu : Screen("main_menu")
@@ -39,13 +41,23 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun NavGraph(navController: NavHostController) {
+    val context = LocalContext.current
+    val db = AppDatabase.getDatabase(context)
+    val dao = db.progressDao()
+    val coroutineScope = rememberCoroutineScope()
     NavHost(
         navController = navController,
         startDestination = Screen.MainMenu.route
     ) {
+
         composable(Screen.MainMenu.route) {
             MainMenuScreen(
-                onStart = { navController.navigate(Screen.Puzzle.createRoute(1)) },
+                onStart = { coroutineScope.launch {
+                    val maxSolvedId = dao.getMaxSolvedPuzzleId() ?: 0
+                    val nextPuzzleId = maxSolvedId + 1
+
+                    navController.navigate(Screen.Puzzle.createRoute(nextPuzzleId))
+                } },
                 onAbout = { navController.navigate(Screen.About.route) }
             )
         }
@@ -90,13 +102,8 @@ fun NavGraph(navController: NavHostController) {
                 fadeOut(tween(1000, delayMillis = 300, easing = EaseInOut)) +
                         slideOutVertically(targetOffsetY = { it }, animationSpec = tween(600, easing = EaseInOut))
             }) { backStackEntry ->
-            val context = LocalContext.current
             val puzzleIdString = backStackEntry.arguments?.getString("puzzleId")
             val puzzleId = puzzleIdString?.toIntOrNull() ?: 1
-
-            val db = AppDatabase.getDatabase(context)
-            val dao = db.progressDao()
-
 
             val viewModel: PuzzleViewModel = viewModel(
                 factory = PuzzleViewModelFactory(puzzleId, dao)
@@ -104,7 +111,12 @@ fun NavGraph(navController: NavHostController) {
 
             PuzzleScreen(
                 viewModel = viewModel,
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onNavigateNext = { nextPuzzleId ->
+                    navController.navigate(Screen.Puzzle.createRoute(nextPuzzleId)) {
+                        popUpTo(Screen.Puzzle.route) { inclusive = true }
+                    }
+                }
             )
         }
     }

@@ -6,10 +6,16 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class PuzzleType {
     @SerialName("binary") BINARY,
-    @SerialName ("acrostic") ACROSTIC,
-    @SerialName ("cipher") CIPHER,
-    @SerialName ("steganography")STEGANOGRAPHY,
-    @SerialName ("spectrogram") SPECTROGRAM
+    @SerialName("acrostic") ACROSTIC,
+    @SerialName("cipher") CIPHER,
+    @SerialName("steganography") STEGANOGRAPHY,
+    @SerialName("spectrogram") SPECTROGRAM,
+    @SerialName("vigenere") VIGENERE,
+    @SerialName("morse") MORSE,
+    @SerialName("hex") HEX,
+    @SerialName("base64") BASE64,
+    @SerialName("exif") EXIF,
+    @SerialName("osint") OSINT
 }
 
 @Serializable

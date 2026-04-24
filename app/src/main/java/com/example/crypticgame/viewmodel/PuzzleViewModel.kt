@@ -20,6 +20,9 @@ class PuzzleViewModel(
     private val _puzzle = MutableStateFlow<Puzzle?>(null)
     val puzzle = _puzzle.asStateFlow()
 
+    private val _isSolved = MutableStateFlow(false)
+    val isSolved = _isSolved.asStateFlow()
+
     private val _terminalOutput = MutableStateFlow("> AWAITING INPUT...")
     val terminalOutput = _terminalOutput.asStateFlow()
 
@@ -34,6 +37,8 @@ class PuzzleViewModel(
 
         if (inputHash == currentPuzzle.answerHash) {
             _terminalOutput.value = currentPuzzle.storyFragment
+
+            _isSolved.value = true
 
             viewModelScope.launch {
                 try {

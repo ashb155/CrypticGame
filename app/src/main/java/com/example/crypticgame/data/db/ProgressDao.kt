@@ -20,4 +20,8 @@ interface ProgressDao {
 
     @Query("SELECT COUNT(*) FROM progress WHERE chapterId = :chapterId AND isSolved = 1")
     suspend fun solvedCountForChapter(chapterId: Int): Int
+
+    @Query("SELECT MAX(puzzleId) FROM progress WHERE isSolved = 1")
+    suspend fun getMaxSolvedPuzzleId(): Int?
+
 }
