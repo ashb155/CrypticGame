@@ -3,6 +3,7 @@ package com.example.crypticgame.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -147,13 +148,13 @@ fun PuzzleScreen(
                                 thickness = 0.5.dp,
                                 color = AccentPrimary.copy(alpha = 0.2f)
                             )
-                            Text(
-                                text = "  ▸ HINT ◂  ",
+                            TypeText(
+                                fullText = "  ▸ HINT ◂  ",
                                 style = MaterialTheme.typography.displayMedium.copy(
                                     color = AccentPrimary.copy(alpha = 0.45f),
                                     fontSize = 22.sp,
                                     letterSpacing = 2.sp
-                                )
+                                ),
                             )
                             HorizontalDivider(
                                 modifier = Modifier.weight(1f),
@@ -187,7 +188,7 @@ fun PuzzleScreen(
                     .fillMaxWidth()
                     .background(
                         color = AccentPrimary.copy(alpha = 0.06f),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(
+                        shape = RoundedCornerShape(
                             topStart = 6.dp, topEnd = 6.dp
                         )
                     )
@@ -263,7 +264,8 @@ fun Modifier.hackerCorners(
 
     val lengthPx = length.toPx()
     val strokePx = strokeWidth.toPx()
-
+    val dimBrush = SolidColor(AccentPrimary.copy(alpha = 0.4f))
+    val dashEffect = PathEffect.dashPathEffect(floatArrayOf(2f, 18f), 0f)
 
     drawLine(brush, Offset(0f, 0f), Offset(lengthPx, 0f), strokePx)
     drawLine(brush, Offset(0f, 0f), Offset(0f, lengthPx), strokePx)
@@ -276,4 +278,17 @@ fun Modifier.hackerCorners(
 
     drawLine(brush, Offset(size.width - lengthPx, size.height), Offset(size.width, size.height), strokePx)
     drawLine(brush, Offset(size.width, size.height - lengthPx), Offset(size.width, size.height), strokePx)
+
+
+    drawLine(dimBrush, Offset(lengthPx, 0f), Offset(size.width - lengthPx, 0f), strokePx,
+        pathEffect = dashEffect)
+
+    drawLine(dimBrush, Offset(lengthPx, size.height), Offset(size.width - lengthPx, size.height), strokePx,
+        pathEffect = dashEffect)
+
+    drawLine(dimBrush, Offset(0f, lengthPx), Offset(0f, size.height - lengthPx), strokePx,
+        pathEffect = dashEffect)
+
+    drawLine(dimBrush, Offset(size.width, lengthPx), Offset(size.width, size.height - lengthPx), strokePx,
+        pathEffect = dashEffect)
 }
