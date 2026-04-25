@@ -21,3 +21,5 @@ val TextDim = Color(0xFF444444)
 val CorrectGreen = Color(0xFF00FF41)
 val WrongRed = Color(0xFFFF3B3B)
 val LockedGray = Color(0xFF1A1A1A)
+
+val ScanlineGreen = Color(0xFF00FF41).copy(alpha = 0.03f)
