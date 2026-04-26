@@ -9,25 +9,18 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.crypticgame.data.db.AppDatabase
-import com.example.crypticgame.ui.components.CrypticButton
 import com.example.crypticgame.ui.screens.AboutScreen
 import com.example.crypticgame.ui.screens.MainMenuScreen
 import com.example.crypticgame.ui.screens.PuzzleScreen
-import com.example.crypticgame.ui.theme.BackgroundDark
 import com.example.crypticgame.viewmodel.PuzzleViewModel
 import kotlinx.coroutines.launch
 
@@ -51,13 +44,21 @@ fun NavGraph(navController: NavHostController) {
     ) {
 
         composable(Screen.MainMenu.route) {
-            MainMenuScreen(
-                onStart = { coroutineScope.launch {
-                    val maxSolvedId = dao.getMaxSolvedPuzzleId() ?: 0
-                    val nextPuzzleId = maxSolvedId + 1
 
-                    navController.navigate(Screen.Puzzle.createRoute(nextPuzzleId))
-                } },
+            val maxSolvedId = produceState(initialValue = 0) {
+                value = dao.getMaxSolvedPuzzleId() ?: 0
+            }
+
+            MainMenuScreen(
+                hasProgress = (maxSolvedId.value > 0),
+                onStart = {
+                    coroutineScope.launch {
+                        val maxSolvedId = dao.getMaxSolvedPuzzleId() ?: 0
+                        val nextPuzzleId = maxSolvedId + 1
+
+                        navController.navigate(Screen.Puzzle.createRoute(nextPuzzleId))
+                    }
+                },
                 onAbout = { navController.navigate(Screen.About.route) }
             )
         }
@@ -66,41 +67,66 @@ fun NavGraph(navController: NavHostController) {
             route = Screen.About.route,
             enterTransition = {
                 fadeIn(tween(800, easing = EaseInOut)) +
-                        slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500, easing = EaseInOut))
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(500, easing = EaseInOut)
+                        )
             },
             exitTransition = {
                 fadeOut(tween(600, easing = EaseInOut)) +
-                        slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400, easing = EaseInOut))
+                        slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(400, easing = EaseInOut)
+                        )
             },
             popEnterTransition = {
                 fadeIn(tween(800, easing = EaseInOut)) +
-                        slideInHorizontally(initialOffsetX = { it }, animationSpec = tween(500, easing = EaseInOut))
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(500, easing = EaseInOut)
+                        )
             },
             popExitTransition = {
                 fadeOut(tween(600, easing = EaseInOut)) +
-                        slideOutHorizontally(targetOffsetX = { it }, animationSpec = tween(400, easing = EaseInOut))
+                        slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(400, easing = EaseInOut)
+                        )
             }
         ) {
             AboutScreen(onBack = { navController.popBackStack() })
         }
 
 
-        composable(Screen.Puzzle.route,
+        composable(
+            Screen.Puzzle.route,
             enterTransition = {
                 fadeIn(tween(1500, delayMillis = 500, easing = EaseInOut)) +
-                    slideInVertically(initialOffsetY = { it }, animationSpec = tween(800, easing = EaseInOut))
-        },
+                        slideInVertically(
+                            initialOffsetY = { it },
+                            animationSpec = tween(800, easing = EaseInOut)
+                        )
+            },
             exitTransition = {
                 fadeOut(tween(1000, delayMillis = 300, easing = EaseInOut)) +
-                        slideOutVertically(targetOffsetY = { it }, animationSpec = tween(600, easing = EaseInOut))
+                        slideOutVertically(
+                            targetOffsetY = { it },
+                            animationSpec = tween(600, easing = EaseInOut)
+                        )
             },
             popEnterTransition = {
                 fadeIn(tween(1500, delayMillis = 500, easing = EaseInOut)) +
-                        slideInVertically(initialOffsetY = { it }, animationSpec = tween(800, easing = EaseInOut))
+                        slideInVertically(
+                            initialOffsetY = { it },
+                            animationSpec = tween(800, easing = EaseInOut)
+                        )
             },
             popExitTransition = {
                 fadeOut(tween(1000, delayMillis = 300, easing = EaseInOut)) +
-                        slideOutVertically(targetOffsetY = { it }, animationSpec = tween(600, easing = EaseInOut))
+                        slideOutVertically(
+                            targetOffsetY = { it },
+                            animationSpec = tween(600, easing = EaseInOut)
+                        )
             }) { backStackEntry ->
             val puzzleIdString = backStackEntry.arguments?.getString("puzzleId")
             val puzzleId = puzzleIdString?.toIntOrNull() ?: 1
@@ -121,3 +147,8 @@ fun NavGraph(navController: NavHostController) {
         }
     }
 }
+
+
+
+
+
