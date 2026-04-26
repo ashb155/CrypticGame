@@ -31,9 +31,9 @@ fun TerminalKeyboard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 16.dp),
+            .padding(top = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         rows.forEachIndexed { index, row ->
             Row(
@@ -55,10 +55,10 @@ fun TerminalKeyboard(
         }
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp)
+                .padding(top = 2.dp)
         ) {
             TerminalKey(
                 text = "< DEL",
@@ -83,7 +83,7 @@ fun TerminalKeyboard(
 fun TerminalKey(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Box(
         modifier = modifier
-            .height(48.dp)
+            .height(40.dp)
             .border(1.dp, AccentPrimary.copy(alpha = 0.4f))
             .background(AccentPrimary.copy(alpha = 0.08f))
             .clickable { onClick() },
@@ -94,7 +94,7 @@ fun TerminalKey(text: String, modifier: Modifier = Modifier, onClick: () -> Unit
             style = MaterialTheme.typography.titleMedium.copy(
                 color = AccentPrimary,
                 fontFamily = ShareTechMono,
-                fontSize = 18.sp
+                fontSize = 16.sp
             )
         )
     }

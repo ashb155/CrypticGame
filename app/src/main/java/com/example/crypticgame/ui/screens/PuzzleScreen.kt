@@ -27,6 +27,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -51,6 +53,7 @@ import com.example.crypticgame.ui.theme.AccentPrimary
 import com.example.crypticgame.ui.theme.BackgroundDark
 import com.example.crypticgame.ui.theme.ScanlineGreen
 import com.example.crypticgame.viewmodel.PuzzleViewModel
+import kotlinx.coroutines.delay
 
 @Composable
 fun PuzzleScreen(
@@ -64,6 +67,15 @@ fun PuzzleScreen(
 
     var userInput by remember { mutableStateOf("") }
     var isHintRevealed by remember { mutableStateOf(false) }
+
+    var cursorVisible by remember { mutableStateOf(true) }
+    LaunchedEffect(userInput) {
+        cursorVisible = true
+        while (true) {
+            delay(530)
+            cursorVisible = !cursorVisible
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -240,11 +252,20 @@ fun PuzzleScreen(
                             Text(
                                 text = "root@kryptiko:~# ",
                                 style = MaterialTheme.typography.headlineMedium.copy(
-                                    color = AccentPrimary.copy(alpha = 0.7f)
+                                    color = AccentPrimary.copy(alpha = 0.7f),
+                                    fontSize = 18.sp
                                 )
                             )
                             Text(
-                                text = userInput + "█",
+                                text = userInput,
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    color = AccentPrimary
+                                ),
+                                maxLines = 1
+                            )
+                            Text(
+                                text = "█",
+                                modifier = Modifier.alpha(if (cursorVisible) 1f else 0f),
                                 style = MaterialTheme.typography.headlineMedium.copy(
                                     color = AccentPrimary
                                 ),
@@ -255,7 +276,7 @@ fun PuzzleScreen(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(290.dp),
+                                .height(240.dp),
                             contentAlignment = Alignment.TopCenter
                         ) {
                             AnimatedContent(
