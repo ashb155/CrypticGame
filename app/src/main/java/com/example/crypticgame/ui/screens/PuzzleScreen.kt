@@ -62,7 +62,6 @@ fun PuzzleScreen(
     val terminalOutput by viewModel.terminalOutput.collectAsState()
     val isSolved by viewModel.isSolved.collectAsState()
 
-
     var userInput by remember { mutableStateOf("") }
     var isHintRevealed by remember { mutableStateOf(false) }
 
@@ -173,13 +172,20 @@ fun PuzzleScreen(
                                 .padding(vertical = 12.dp)
                         ) {
                             HorizontalDivider(modifier = Modifier.weight(1f), thickness = 0.5.dp, color = AccentPrimary.copy(alpha = 0.2f))
-                            TypeText(
-                                fullText = if (!isHintRevealed) "  ▸ HINT ◂  " else "  ▸ BACK ◂  ",
-                                style = MaterialTheme.typography.titleMedium.copy(
-                                    color = AccentPrimary.copy(alpha = 0.6f),
-                                    letterSpacing = 2.sp
+
+                            Box(
+                                modifier = Modifier.width(140.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                TypeText(
+                                    fullText = if (!isHintRevealed) "  ▸ HINT ◂  " else "  ▸ BACK ◂  ",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        color = AccentPrimary.copy(alpha = 0.6f),
+                                        letterSpacing = 2.sp
+                                    )
                                 )
-                            )
+                            }
+
                             HorizontalDivider(modifier = Modifier.weight(1f), thickness = 0.5.dp, color = AccentPrimary.copy(alpha = 0.2f))
                         }
                     }
@@ -255,15 +261,23 @@ fun PuzzleScreen(
                             AnimatedContent(
                                 targetState = isHintRevealed,
                                 transitionSpec = {
-                                    val duration = 800
-                                    (slideInVertically(
-                                        animationSpec = tween(duration, easing = FastOutSlowInEasing)
-                                    ) { height -> height / 4 } + fadeIn(animationSpec = tween(duration)))
-                                        .togetherWith(
-                                            slideOutVertically(
-                                                animationSpec = tween(duration, easing = FastOutSlowInEasing)
-                                            ) { height -> -height / 4 } + fadeOut(animationSpec = tween(duration))
-                                        )
+                                    val duration = 600
+
+                                    if (targetState) {
+                                        (slideInVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> height / 3 } +
+                                                fadeIn(animationSpec = tween(duration)))
+                                            .togetherWith(
+                                                slideOutVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> -height / 3 } +
+                                                        fadeOut(animationSpec = tween(duration))
+                                            )
+                                    } else {
+                                        (slideInVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> -height / 3 } +
+                                                fadeIn(animationSpec = tween(duration)))
+                                            .togetherWith(
+                                                slideOutVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> height / 3 } +
+                                                        fadeOut(animationSpec = tween(duration))
+                                            )
+                                    }
                                 },
                                 label = "Terminal Buffer Swap"
                             ) { showHint ->
@@ -280,7 +294,7 @@ fun PuzzleScreen(
 
                                         puzzle?.let { currentPuzzle ->
                                             Text(
-                                                text = currentPuzzle.hint,
+                                                text = currentPuzzle.hint.replace(".",".\n"),
                                                 style = MaterialTheme.typography.headlineMedium.copy(
                                                     color = AccentPrimary.copy(alpha = 0.8f),
                                                     fontSize = 20.sp,
