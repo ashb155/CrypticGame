@@ -50,7 +50,7 @@ class PuzzleViewModel(
                 }
             }
         } else {
-            _terminalOutput.value = "> ACCESS DENIED. INVALID CREDENTIALS."
+            _terminalOutput.value = "> ACCESS DENIED."
         }
     }
 
