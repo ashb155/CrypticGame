@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,8 +66,8 @@ fun PuzzleScreen(
     val terminalOutput by viewModel.terminalOutput.collectAsState()
     val isSolved by viewModel.isSolved.collectAsState()
 
-    var userInput by remember { mutableStateOf("") }
-    var isHintRevealed by remember { mutableStateOf(false) }
+    var userInput by rememberSaveable { mutableStateOf("") }
+    var isHintRevealed by rememberSaveable { mutableStateOf(false) }
 
     var cursorVisible by remember { mutableStateOf(true) }
     LaunchedEffect(userInput) {
@@ -237,82 +238,79 @@ fun PuzzleScreen(
                     Spacer(Modifier.height(12.dp))
                 }
 
-                if (isSolved) {
-                    puzzle?.unlocksNext?.let { nextId ->
-                        CrypticButton(label = "./proceed", onClick = { onNavigateNext(nextId) })
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "root@kryptiko:~# ",
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                color = AccentPrimary.copy(alpha = 0.7f),
+                                fontSize = 18.sp
+                            )
+                        )
+                        Text(
+                            text = userInput,
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                color = AccentPrimary
+                            ),
+                            maxLines = 1
+                        )
+                        Text(
+                            text = "█",
+                            modifier = Modifier.alpha(if (cursorVisible && !isSolved) 1f else 0f),
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                color = AccentPrimary
+                            ),
+                            maxLines = 1
+                        )
                     }
-                } else {
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "root@kryptiko:~# ",
-                                style = MaterialTheme.typography.headlineMedium.copy(
-                                    color = AccentPrimary.copy(alpha = 0.7f),
-                                    fontSize = 18.sp
-                                )
-                            )
-                            Text(
-                                text = userInput,
-                                style = MaterialTheme.typography.headlineMedium.copy(
-                                    color = AccentPrimary
-                                ),
-                                maxLines = 1
-                            )
-                            Text(
-                                text = "█",
-                                modifier = Modifier.alpha(if (cursorVisible) 1f else 0f),
-                                style = MaterialTheme.typography.headlineMedium.copy(
-                                    color = AccentPrimary
-                                ),
-                                maxLines = 1
-                            )
-                        }
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(240.dp),
-                            contentAlignment = Alignment.TopCenter
-                        ) {
-                            AnimatedContent(
-                                targetState = isHintRevealed,
-                                transitionSpec = {
-                                    val duration = 600
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(240.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        val terminalState = if (isSolved) "PROCEED" else if (isHintRevealed) "HINT" else "KEYBOARD"
 
-                                    if (targetState) {
-                                        (slideInVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> height / 3 } +
-                                                fadeIn(animationSpec = tween(duration)))
-                                            .togetherWith(
-                                                slideOutVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> -height / 3 } +
-                                                        fadeOut(animationSpec = tween(duration))
-                                            )
-                                    } else {
-                                        (slideInVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> -height / 3 } +
-                                                fadeIn(animationSpec = tween(duration)))
-                                            .togetherWith(
-                                                slideOutVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> height / 3 } +
-                                                        fadeOut(animationSpec = tween(duration))
-                                            )
+                        AnimatedContent(
+                            targetState = terminalState,
+                            transitionSpec = {
+                                val duration = 600
+                                (slideInVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> height / 3 } +
+                                        fadeIn(animationSpec = tween(duration)))
+                                    .togetherWith(
+                                        slideOutVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> -height / 3 } +
+                                                fadeOut(animationSpec = tween(duration))
+                                    )
+                            },
+                            label = "Terminal Buffer Swap"
+                        ) { state ->
+
+                            when (state) {
+                                "PROCEED" -> {
+                                    Column(
+                                        modifier = Modifier.fillMaxSize(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        puzzle?.unlocksNext?.let { nextId ->
+                                            CrypticButton(label = "./proceed", onClick = { onNavigateNext(nextId) })
+                                        }
                                     }
-                                },
-                                label = "Terminal Buffer Swap"
-                            ) { showHint ->
-
-                                if (showHint) {
+                                }
+                                "HINT" -> {
                                     Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(top = 16.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-
                                         Spacer(Modifier.height(16.dp))
-
                                         puzzle?.let { currentPuzzle ->
                                             Text(
                                                 text = currentPuzzle.hint.replace(".",".\n"),
@@ -325,9 +323,9 @@ fun PuzzleScreen(
                                                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
                                             )
                                         }
-
                                     }
-                                } else {
+                                }
+                                "KEYBOARD" -> {
                                     TerminalKeyboard(
                                         onKeyPress = { char ->
                                             if (userInput.length < 30) {
@@ -349,7 +347,6 @@ fun PuzzleScreen(
                                 }
                             }
                         }
-
                     }
                 }
             }
