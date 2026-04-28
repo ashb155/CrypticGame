@@ -47,7 +47,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.crypticgame.data.model.PuzzleType
 import com.example.crypticgame.ui.components.CrypticButton
+import com.example.crypticgame.ui.components.MorseInputPad
 import com.example.crypticgame.ui.components.TerminalKeyboard
 import com.example.crypticgame.ui.components.TypeText
 import com.example.crypticgame.ui.theme.AccentPrimary
@@ -77,6 +79,10 @@ fun PuzzleScreen(
             cursorVisible = !cursorVisible
         }
     }
+
+
+
+
 
     Box(
         modifier = Modifier
@@ -184,7 +190,11 @@ fun PuzzleScreen(
                                 .clickable { isHintRevealed = !isHintRevealed }
                                 .padding(vertical = 12.dp)
                         ) {
-                            HorizontalDivider(modifier = Modifier.weight(1f), thickness = 0.5.dp, color = AccentPrimary.copy(alpha = 0.2f))
+                            HorizontalDivider(
+                                modifier = Modifier.weight(1f),
+                                thickness = 0.5.dp,
+                                color = AccentPrimary.copy(alpha = 0.2f)
+                            )
 
                             Box(
                                 modifier = Modifier.width(140.dp),
@@ -199,7 +209,11 @@ fun PuzzleScreen(
                                 )
                             }
 
-                            HorizontalDivider(modifier = Modifier.weight(1f), thickness = 0.5.dp, color = AccentPrimary.copy(alpha = 0.2f))
+                            HorizontalDivider(
+                                modifier = Modifier.weight(1f),
+                                thickness = 0.5.dp,
+                                color = AccentPrimary.copy(alpha = 0.2f)
+                            )
                         }
                     }
 
@@ -275,16 +289,27 @@ fun PuzzleScreen(
                             .height(240.dp),
                         contentAlignment = Alignment.TopCenter
                     ) {
-                        val terminalState = if (isSolved) "PROCEED" else if (isHintRevealed) "HINT" else "KEYBOARD"
+                        val terminalState =
+                            if (isSolved) "PROCEED" else if (isHintRevealed) "HINT" else "KEYBOARD"
 
                         AnimatedContent(
                             targetState = terminalState,
                             transitionSpec = {
                                 val duration = 600
-                                (slideInVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> height / 3 } +
+                                (slideInVertically(
+                                    animationSpec = tween(
+                                        duration,
+                                        easing = FastOutSlowInEasing
+                                    )
+                                ) { height -> height / 3 } +
                                         fadeIn(animationSpec = tween(duration)))
                                     .togetherWith(
-                                        slideOutVertically(animationSpec = tween(duration, easing = FastOutSlowInEasing)) { height -> -height / 3 } +
+                                        slideOutVertically(
+                                            animationSpec = tween(
+                                                duration,
+                                                easing = FastOutSlowInEasing
+                                            )
+                                        ) { height -> -height / 3 } +
                                                 fadeOut(animationSpec = tween(duration))
                                     )
                             },
@@ -299,10 +324,13 @@ fun PuzzleScreen(
                                         verticalArrangement = Arrangement.Center
                                     ) {
                                         puzzle?.unlocksNext?.let { nextId ->
-                                            CrypticButton(label = "./proceed", onClick = { onNavigateNext(nextId) })
+                                            CrypticButton(
+                                                label = "./proceed",
+                                                onClick = { onNavigateNext(nextId) })
                                         }
                                     }
                                 }
+
                                 "HINT" -> {
                                     Column(
                                         modifier = Modifier
@@ -313,37 +341,49 @@ fun PuzzleScreen(
                                         Spacer(Modifier.height(16.dp))
                                         puzzle?.let { currentPuzzle ->
                                             Text(
-                                                text = currentPuzzle.hint.replace(".",".\n"),
+                                                text = currentPuzzle.hint.replace(".", ".\n"),
                                                 style = MaterialTheme.typography.headlineMedium.copy(
                                                     color = AccentPrimary.copy(alpha = 0.8f),
                                                     fontSize = 20.sp,
                                                     textAlign = TextAlign.Center,
                                                     lineHeight = 28.sp
                                                 ),
-                                                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                                                modifier = Modifier.fillMaxWidth()
+                                                    .padding(horizontal = 16.dp)
                                             )
                                         }
                                     }
                                 }
+
                                 "KEYBOARD" -> {
-                                    TerminalKeyboard(
-                                        onKeyPress = { char ->
-                                            if (userInput.length < 30) {
-                                                userInput += char
+                                    if (puzzle?.type == PuzzleType.MORSE) {
+                                        MorseInputPad(
+                                            currentWord = userInput,
+                                            onWordChange = { userInput = it },
+                                            onSubmit = { finalDecodedWord ->
+                                                viewModel.submitAnswer(finalDecodedWord)
                                             }
-                                        },
-                                        onBackspace = {
-                                            if (userInput.isNotEmpty()) {
-                                                userInput = userInput.dropLast(1)
+                                        )
+                                    } else {
+                                        TerminalKeyboard(
+                                            onKeyPress = { char ->
+                                                if (userInput.length < 30) {
+                                                    userInput += char
+                                                }
+                                            },
+                                            onBackspace = {
+                                                if (userInput.isNotEmpty()) {
+                                                    userInput = userInput.dropLast(1)
+                                                }
+                                            },
+                                            onSubmit = {
+                                                if (userInput.isNotBlank()) {
+                                                    viewModel.submitAnswer(userInput)
+                                                    userInput = ""
+                                                }
                                             }
-                                        },
-                                        onSubmit = {
-                                            if (userInput.isNotBlank()) {
-                                                viewModel.submitAnswer(userInput)
-                                                userInput = ""
-                                            }
-                                        }
-                                    )
+                                        )
+                                    }
                                 }
                             }
                         }
