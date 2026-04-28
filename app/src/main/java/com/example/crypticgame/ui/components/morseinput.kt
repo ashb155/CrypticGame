@@ -82,6 +82,25 @@ fun MorseInputPad(
     val onWordChangeUpdated by rememberUpdatedState(onWordChange)
     val onSubmitUpdated by rememberUpdatedState(onSubmit)
 
+    val buttonScale by animateFloatAsState(
+        targetValue = if (keyPressed) 0.92f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "buttonScale"
+    )
+
+    val glowAlpha by animateFloatAsState(
+        targetValue = if (keyPressed) 0.25f else 0.05f,
+        label = "glowAlpha"
+    )
+
+    val coreAlpha by animateFloatAsState(
+        targetValue = if (keyPressed) 1f else 0.2f,
+        label = "coreAlpha"
+    )
+
     @RequiresPermission(Manifest.permission.VIBRATE)
     fun vibrate(durationMs: Long) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -128,7 +147,7 @@ fun MorseInputPad(
         ) {
             if (currentSymbols.isNotEmpty()) {
                 Text(
-                    text = "  [${currentSymbols}]",
+                    text = "[${currentSymbols}]",
                     style = MaterialTheme.typography.headlineMedium.copy(
                         color = AccentPrimary.copy(alpha = 0.5f),
                         fontSize = 20.sp
@@ -140,83 +159,58 @@ fun MorseInputPad(
         Spacer(Modifier.height(12.dp))
 
         Box(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .size(130.dp)
+                .scale(buttonScale)
+                .clip(CircleShape)
+                .background(AccentPrimary.copy(alpha = glowAlpha))
+                .border(1.dp, AccentPrimary.copy(alpha = 0.2f), CircleShape)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onPress = {
+                            keyPressed = true
+                            pressStartTime = System.currentTimeMillis()
+                            letterCommitJob?.cancel()
+
+                            tryAwaitRelease()
+
+                            keyPressed = false
+
+                            val held = System.currentTimeMillis() - pressStartTime
+                            if (held >= dash_threshold) {
+                                currentSymbols += "-"
+                                vibrate(120)
+                            } else {
+                                currentSymbols += "."
+                                vibrate(40)
+                            }
+
+                            scheduleLetterCommit()
+                        }
+                    )
+                },
             contentAlignment = Alignment.Center
         ) {
-            val buttonScale by animateFloatAsState(
-                targetValue = if (keyPressed) 0.92f else 1f,
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
-                label = "buttonScale"
-            )
-
-            val glowAlpha by animateFloatAsState(
-                targetValue = if (keyPressed) 0.25f else 0.05f,
-                label = "glowAlpha"
-            )
-
-            val coreAlpha by animateFloatAsState(
-                targetValue = if (keyPressed) 1f else 0.2f,
-                label = "coreAlpha"
-            )
-
             Box(
                 modifier = Modifier
-                    .size(130.dp)
-                    .scale(buttonScale)
-                    .clip(CircleShape)
-                    .background(AccentPrimary.copy(alpha = glowAlpha))
-                    .border(1.dp, AccentPrimary.copy(alpha = 0.2f), CircleShape)
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onPress = {
-                                keyPressed = true
-                                pressStartTime = System.currentTimeMillis()
-                                letterCommitJob?.cancel()
-
-                                tryAwaitRelease()
-
-                                keyPressed = false
-
-                                val held = System.currentTimeMillis() - pressStartTime
-                                if (held >= dash_threshold) {
-                                    currentSymbols += "-"
-                                    vibrate(120)
-                                } else {
-                                    currentSymbols += "."
-                                    vibrate(40)
-                                }
-
-                                scheduleLetterCommit()
-                            }
-                        )
-                    },
+                    .size(80.dp)
+                    .border(1.dp, AccentPrimary.copy(alpha = 0.4f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
+
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
-                        .border(1.dp, AccentPrimary.copy(alpha = 0.4f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    Box(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clip(CircleShape)
-                            .background(AccentPrimary.copy(alpha = coreAlpha))
-                            .border(
-                                width = if (keyPressed) 2.dp else 1.dp,
-                                color = AccentPrimary,
-                                shape = CircleShape
-                            )
-                    )
-                }
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(AccentPrimary.copy(alpha = coreAlpha))
+                        .border(
+                            width = if (keyPressed) 2.dp else 1.dp,
+                            color = AccentPrimary,
+                            shape = CircleShape
+                        )
+                )
             }
         }
-
 
         Spacer(Modifier.height(28.dp))
 
