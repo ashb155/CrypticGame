@@ -46,7 +46,7 @@ fun TerminalKeyboard(
                     TerminalKey(
                         text = key,
                         modifier = Modifier.weight(1f),
-                        onClick = { onKeyPress(key.lowercase()) }
+                        onClick = { onKeyPress(key.uppercase()) }
                     )
                 }
                 if (index == 2) Spacer(modifier = Modifier.weight(0.5f))

@@ -80,10 +80,6 @@ fun PuzzleScreen(
         }
     }
 
-
-
-
-
     Box(
         modifier = Modifier
             .fillMaxSize()

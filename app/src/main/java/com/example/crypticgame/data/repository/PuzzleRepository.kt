@@ -20,12 +20,12 @@ class PuzzleRepository{
             id = 2,
             type = PuzzleType.MORSE,
             title = "KEY 2",
-            content = "... .. --. -. .- .-..",
-            hint = "the first wireless language. dots and dashes. dit dah.",
+            content = "3S·2S·2L1S·1L1S\n 1S1L·1S2L2S",
+            hint = "short or long.",
             answerHash = "d041924c15885af6d06530a425c6dbffc80520150c4dd264f40b4364b12421a8",
-            storyFragment = "DECODED",
+            storyFragment = "still transmitting.",
             unlocksNext = 3
-        ),
+        )
     )
     fun getPuzzleById (id : Int): Puzzle?{
         return puzzles.find { it.id == id }

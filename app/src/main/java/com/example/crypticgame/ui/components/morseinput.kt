@@ -122,7 +122,7 @@ fun MorseInputPad(
     fun commitLetter() {
         if (currentSymbols.isNotEmpty()) {
             val letter = morse_to_char[currentSymbols]
-            val newWord = if (letter != null) currentWordUpdated + letter else currentWordUpdated + "?"
+            val newWord = if (letter != null) currentWordUpdated + letter else "$currentWordUpdated?"
             onWordChangeUpdated(newWord)
             currentSymbols = ""
         }

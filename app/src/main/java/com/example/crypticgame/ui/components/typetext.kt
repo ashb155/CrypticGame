@@ -33,7 +33,7 @@ fun TypeText(
     var displayedText by remember { mutableStateOf("") }
     var isTextGlitching by remember { mutableStateOf(false) }
     var glitchOffsetX by remember { mutableFloatStateOf(0f) }
-    var glitchAlpha by remember { mutableStateOf(1f) }
+    var glitchAlpha by remember { mutableFloatStateOf(1f) }
     var flickerAlpha by remember { mutableFloatStateOf(1f) }
 
     val infiniteTransition = rememberInfiniteTransition(label = "glow_transition")
